@@ -31,7 +31,7 @@ jobs:
             npm init -y
           fi
 
-          npm install --no-save @capacitor/core @capacitor/cli @capacitor/android
+          npm install --no-save @capacitor/core @capacitor/cli @capacitor/android @capacitor-community/text-to-speech
 
           mkdir -p www
           if [ -f "index.html" ]; then
