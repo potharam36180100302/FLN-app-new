@@ -31,7 +31,30 @@ const SCHOOL="MPPS POTHARAM, Mdl : Dubbak, Dist : Siddipet";
 try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices()}catch(e){}
 const NT=()=>{try{return window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()&&Capacitor.Plugins&&Capacitor.Plugins.TextToSpeech}catch(e){}};
 let _au;const onl=(t,l)=>{try{if(_au)_au.pause();_au=new Audio('https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl='+l+'&q='+encodeURIComponent(String(t).slice(0,190)));const r=_au.play();if(r&&r.catch)r.catch(()=>{})}catch(e){}};
-const say=t=>{try{const N=NT();if(N){try{N.stop()}catch(e){}N.speak({text:t,lang:window.TL?'te-IN':'en-IN',rate:.85,pitch:1,volume:1,category:'ambient'}).catch(()=>{});return}if(typeof speechSynthesis==='undefined'||!speechSynthesis.getVoices().length){onl(t,window.TL?'te':'en');return}const s=speechSynthesis;s.cancel();s.resume();if(window.TL){const u=new SpeechSynthesisUtterance(t),tv=s.getVoices().find(x=>/^te/i.test(x.lang));if(!tv){onl(t,'te');return}u.voice=tv;u.lang='te-IN';u.rate=.8;setTimeout(()=>s.speak(u),80);return}const u=new SpeechSynthesisUtterance(t),v=s.getVoices(),b=v.find(x=>/en[-_]IN/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang)&&/india|heera|neerja|veena|rishi/i.test(x.name))||v.find(x=>/^en/i.test(x.lang));u.lang='en-IN';if(b){u.voice=b;if(/en[-_]IN/i.test(b.lang))u.lang=b.lang}u.rate=.85;setTimeout(()=>s.speak(u),80)}catch(e){}};
+const say = async (t) => {
+  if (!t) return;
+  const isTe = /[\u0C00-\u0C7F]/.test(t);
+  const lang = isTe ? 'te-IN' : 'en-IN';
+  try {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.TextToSpeech) {
+      await window.Capacitor.Plugins.TextToSpeech.stop();
+      await window.Capacitor.Plugins.TextToSpeech.speak({
+        text: t,
+        lang: lang,
+        rate: 0.9,
+        pitch: 1.0,
+        volume: 1.0
+      });
+    } else if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(t);
+      u.lang = lang;
+      window.speechSynthesis.speak(u);
+    }
+  } catch (e) {
+    console.log(e);
+  }
+};
 let ac;const tone=(f,t=0,d=.25,ty='sine',v=.12)=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=ty;o.frequency.value=f;o.connect(g);g.connect(ac.destination);const s=ac.currentTime+t;g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.start(s);o.stop(s+d)}catch(e){}};
 const win=()=>[523,659,784,1047].forEach((f,i)=>tone(f,i*.1)),oops=()=>tone(220,0,.3,'triangle'),tap=()=>tone(880,0,.08,'sine',.06);
 const sh=a=>[...a].sort(()=>Math.random()-.5);
